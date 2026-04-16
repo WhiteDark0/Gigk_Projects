@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="1200px" height="550px"
+    viewBox="0 0 10 10"
+    preserveAspectRatio="xMidYMid">
+    <defs>
+        <g id="moon">
+            <!-- Animation -->
+            <animateTransform
+            attributeName="transform"
+            begin="0s"
+            dur="10s"
+            type="rotate"
+            from="0 2.5 5"
+            to="360 2.5 5"
+            repeatCount="indefinite" />
+
+            <!-- Moon shape -->
+            <circle cx="2" cy="5" r="2"
+                fill="yellow" stroke="yellow" stroke-width="0.03"/>
+            <circle cx="0.9" cy="3.9" r="2"
+                fill="white" stroke="white" stroke-width="0.03"/>
+            
+            <!-- Mouth -->
+            <circle cx="3" cy="5.8" r="0.5"
+                fill="black" stroke="black" stroke-width="0.03"/>
+            <rect x="2.45" y="5.25" width="1.1" height="0.6"
+                stroke="yellow" fill="yellow" stroke-width="0.01"/>
+            <line x1="2.3" y1="5.88" x2="2.5" y2="5.88"
+                stroke-width="0.05" stroke="black"/>
+            <line x1="2.52" y1="5.88" x2="2.52" y2="5.65"
+                stroke-width="0.05" stroke="black"/>
+            <line x1="3.5" y1="5.88" x2="3.7" y2="5.88"
+                stroke-width="0.05" stroke="black"/>
+            <line x1="3.49" y1="5.88" x2="3.49" y2="5.65"
+                stroke-width="0.05" stroke="black"/>
+
+            <!-- Eyes -->
+            <circle cx="3" cy="4.8" r="0.13"
+                fill="white" stroke="white" stroke-width="0.03"/>
+            <circle cx="3.7" cy="5.1" r="0.13"
+                fill="white" stroke="white" stroke-width="0.03"/>
+            <circle cx="3" cy="4.8" r="0.08"
+                fill="black" stroke="black" stroke-width="0.03"/>
+            <circle cx="3.7" cy="5.1" r="0.08"
+                fill="black" stroke="black" stroke-width="0.03"/>
+            <circle cx="2.98" cy="4.78" r="0.01"
+                fill="white" stroke="white" stroke-width="0.03"/>
+            <circle cx="3.68" cy="5.08" r="0.01"
+                fill="white" stroke="white" stroke-width="0.03"/>
+        </g>
+    </defs>
+
+
+    <!-- Windmill nr.1 -->
+    <g>
+        <use xlink:href = "#moon" transform = "translate(2,3.3) scale(0.5,0.5)"/>
+        <use xlink:href = "#moon" transform = "translate(6.7,5.2) scale(0.5,0.5)"/>
+        <polygon points="6,10 5,10 5.5,7" 
+            fill="blue" stroke="blue" stroke-width="0.03"/>   
+        <line x1="3.1" y1="5.85" x2="8" y2="8"
+            stroke-width="0.3" stroke="red"/>
+    </g>
+
+    <!-- Windmill nr.2 -->
+    <g transform="translate(-5,-4) scale(0.9)">
+        <use xlink:href = "#moon" transform = "translate(2,3.3) scale(0.5,0.5)"/>
+        <use xlink:href = "#moon" transform = "translate(6.7,5.2) scale(0.5,0.5)"/>
+        <polygon points="6,10 5,10 5.5,7" 
+            fill="purple" stroke="purple" stroke-width="0.03"/>    
+        <line x1="3.1" y1="5.85" x2="8" y2="8"
+            stroke-width="0.3" stroke="red"/>
+    </g>
+
+    <!-- Windmill nr.3 -->
+    <g transform="translate(6,-3.5) scale(0.8)">
+        <use xlink:href = "#moon" transform = "translate(2,3.3) scale(0.5,0.5)"/>
+        <use xlink:href = "#moon" transform = "translate(6.7,5.2) scale(0.5,0.5)"/>
+        <polygon points="6,10 5,10 5.5,7" 
+            fill="green" stroke="green" stroke-width="0.03"/>   
+        <line x1="3.1" y1="5.85" x2="8" y2="8"
+            stroke-width="0.3" stroke="red"/>   
+    </g>
+</svg>
