@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pyramid Core</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+
+<script>
+
+let mode = 1;
+let gl, program;
+
+let rotateX = 15;
+let rotateY = -15;
+let rotateZ = 0;
+
+// ----------------------------------------
+
+const vs = `
+attribute vec3 aPosition;
+uniform mat4 uMVP;
+
+void main() {
+    gl_Position = uMVP * vec4(aPosition, 1.0);
+}
+`;
+
+const fs = `
+precision mediump float;
+uniform vec3 uColor;
+
+void main() {
+    gl_FragColor = vec4(uColor, 1.0);
+}
+`;
+
+// ----------------------------------------
+
+function initGL(canvas) {
+
+    gl = canvas.getContext("webgl");
+
+    function compile(type, src) {
+        let s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+    }
+
+    let v = compile(gl.VERTEX_SHADER, vs);
+    let f = compile(gl.FRAGMENT_SHADER, fs);
+
+    program = gl.createProgram();
+    gl.attachShader(program, v);
+    gl.attachShader(program, f);
+    gl.linkProgram(program);
+
+    gl.useProgram(program);
+    gl.enable(gl.DEPTH_TEST);
+}
+
+// ----------------------------------------
+
+function draw(vertices, mvp, color) {
+
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    let pos = gl.getAttribLocation(program, "aPosition");
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 3, gl.FLOAT, false, 0, 0);
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "uMVP"), false, mvp);
+    gl.uniform3fv(gl.getUniformLocation(program, "uColor"), color);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 3);
+}
+
+// ----------------------------------------
+
+function triangleFanSide(mvp, color) {
+
+    let v = [
+        0, 0.7, 0,
+        -0.21, 0, 0.5,
+         0.21, 0, 0.5
+    ];
+
+    draw(v, mvp, color);
+}
+
+// ----------------------------------------
+
+function basePolygon(n, mvp, color) {
+
+    let v = [];
+
+    for (let i = 0; i < n; i++) {
+
+        let a1 = 1.18+(i / n) * 2 * Math.PI;
+        let a2 = 1.18+((i + 1) / n) * 2 * Math.PI;
+
+        let x1 = Math.cos(a1) * 0.542;
+        let z1 = Math.sin(a1) * 0.542;
+
+        let x2 = Math.cos(a2) * 0.542;
+        let z2 = Math.sin(a2) * 0.542;
+
+        v.push(
+            0, 0, 0,
+            x1, 0, z1,
+            x2, 0, z2
+        );
+    }
+
+    draw(v, mvp, color);
+}
+
+// ----------------------------------------
+
+function pyramid(n, baseMVP) {
+
+    for (let i = 0; i < n; i++) {
+        let r = Math.random();
+        let g = Math.random();
+        let b = Math.random();
+        let m = mat4.clone(baseMVP);
+
+        mat4.rotateY(m, m, (2*Math.PI / n) * i);
+
+        triangleFanSide(m, [r,g,b]);
+    }
+
+    let m2 = mat4.clone(baseMVP);
+    mat4.rotateX(m2, m2, Math.PI);
+
+    basePolygon(n, m2, [1,1,0]);
+}
+
+function test(n, baseMVP){
+
+    let v = [];
+
+    let turns = n;          // liczba obrotów
+    let steps = n * 80;     // gładkość
+
+    for (let i = 0; i <= steps; i++){
+
+        let t = i / steps;
+
+        let angle = t * turns * 2 * Math.PI;
+
+        let y = t * 1.5 - 0.75;
+
+        let r = 0.05 + t * 0.6;
+
+        let x = Math.cos(angle) * r;
+        let z = Math.sin(angle) * r;
+
+        v.push(x, y, z);
+    }
+
+    let color;
+
+    if (n < 5) color = [0,1,0];        // zielony
+    else if (n < 10) color = [0,0,1];  // niebieski
+    else color = [0.6,0.3,0];          // brązowy
+
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+
+    let pos = gl.getAttribLocation(program, "aPosition");
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 3, gl.FLOAT, false, 0, 0);
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "uMVP"), false, baseMVP);
+    gl.uniform3fv(gl.getUniformLocation(program, "uColor"), color);
+
+    gl.drawArrays(gl.LINE_STRIP, 0, v.length / 3);
+}
+
+// ----------------------------------------
+
+function display() {
+    
+    gl.clearColor(0,0,0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    let mvp = mat4.create();
+
+    mat4.rotateZ(mvp, mvp, rotateZ * Math.PI/180);
+    mat4.rotateY(mvp, mvp, rotateY * Math.PI/180);
+    mat4.rotateX(mvp, mvp, rotateX * Math.PI/180);
+    
+    if (mode == 1) {
+        pyramid(8, mvp);
+    }
+    else if (mode == 2) {
+        test(6, mvp);
+    }
+}
+
+// ----------------------------------------
+
+function key(evt) {
+
+    let k = evt.keyCode;
+
+    if (k == 37) rotateY -= 15;
+    if (k == 39) rotateY += 15;
+    if (k == 38) rotateX -= 15;
+    if (k == 40) rotateX += 15;
+    if (k == 33) rotateZ += 15;
+    if (k == 34) rotateZ -= 15;
+    if (k == 36) rotateX = rotateY = rotateZ = 0;
+
+    // 1
+    if (k == 49) {
+        mode = 1;
+    }
+
+    // 2
+    else if (k == 50) {
+        mode = 2;
+    }
+
+    display();
+}
+
+// ----------------------------------------
+
+function init() {
+
+    let canvas = document.getElementById("glcanvas");
+    initGL(canvas);
+
+    document.onkeydown = key;
+
+    display();
+}
+
+</script>
+</head>
+
+<body onload="init()">
+
+<h3>A Simple Unlit Cube in OpenGL 1.1</h3>
+
+<p>(Rotate using arrow keys, page up, page down, and home keys.)</p>
+
+<noscript>
+<p><b>Sorry, this page requires JavaScript!</b></p>
+</noscript>
+
+<div id="canvas-holder">
+<canvas id="glcanvas" width="500" height="500"></canvas>
+</div>
+
+</body>
+</html>
